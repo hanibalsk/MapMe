@@ -50,7 +50,9 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
         if (itemCount < 1) {
             return false
         }
-        updates.add(UpdateOp(UpdateOp.UPDATE, positionStart, itemCount, payload))
+        synchronized(updates) {
+            updates.add(UpdateOp(UpdateOp.UPDATE, positionStart, itemCount, payload))
+        }
         return updates.size == 1
     }
 
@@ -61,7 +63,9 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
         if (itemCount < 1) {
             return false
         }
-        updates.add(UpdateOp(UpdateOp.ADD, positionStart, itemCount, null))
+        synchronized(updates) {
+            updates.add(UpdateOp(UpdateOp.ADD, positionStart, itemCount, null))
+        }
         return updates.size == 1
     }
 
@@ -72,7 +76,9 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
         if (itemCount < 1) {
             return false
         }
-        updates.add(UpdateOp(UpdateOp.REMOVE, positionStart, itemCount, null))
+        synchronized(updates) {
+            updates.add(UpdateOp(UpdateOp.REMOVE, positionStart, itemCount, null))
+        }
         return updates.size == 1
     }
 
@@ -86,7 +92,9 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
         if (itemCount != 1) {
             throw IllegalArgumentException("Moving more than 1 item is not supported yet")
         }
-        updates.add(UpdateOp(UpdateOp.MOVE, from, to, null))
+        synchronized(updates) {
+            updates.add(UpdateOp(UpdateOp.MOVE, from, to, null))
+        }
         return updates.size == 1
     }
 
@@ -100,10 +108,12 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
             Log.d(TAG, updates.toString())
         }
 
-        dispatchFirstPass()
-        dispatchSecondPass()
+        synchronized(updates) {
+            dispatchFirstPass()
+            dispatchSecondPass()
 
-        updates.clear()
+            updates.clear()
+        }
     }
 
     fun dispatchSecondPass() {
@@ -158,7 +168,9 @@ class MapAdapterHelper(val callbacks: MapAdapterHelperCallback, val debug: Boole
     }
 
     fun clearPendingUpdates() {
-        this.updates.clear()
+        synchronized(updates) {
+            this.updates.clear()
+        }
     }
 }
 
